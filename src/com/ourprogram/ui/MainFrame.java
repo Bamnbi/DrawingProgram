@@ -223,7 +223,7 @@ public class MainFrame extends JFrame {
             
             // 设置绘图颜色
             g.setColor(Color.BLACK);
-            
+                
             // 绘制提示文字
             g.setColor(Color.LIGHT_GRAY);
             g.drawString("在绘图区点击进行绘制", 350, 250);
