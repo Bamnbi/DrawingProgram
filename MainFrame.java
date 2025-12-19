@@ -1,9 +1,7 @@
-package com.outprogram.ui;
+package com.ourprogram.ui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
@@ -21,9 +19,6 @@ public class MainFrame extends JFrame {
     // 当前工具状态
     private String currentTool = "line";
     
-    // 状态栏标签
-    private JLabel statusLabel;
-
     public MainFrame() {
         // 初始化界面
         initUI();
@@ -45,11 +40,6 @@ public class MainFrame extends JFrame {
         
         // 初始化绘图面板
         initDrawingPanel();
-        
-        // 创建状态栏
-        statusLabel = new JLabel(" 当前工具: " + currentTool);
-        statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
-        add(statusLabel, BorderLayout.SOUTH);
         
         // 设置窗口可见
         setVisible(true);
@@ -91,11 +81,6 @@ public class MainFrame extends JFrame {
         JMenu helpMenu = new JMenu("帮助");
         helpMenu.setMnemonic('H');
         JMenuItem aboutItem = new JMenuItem("关于");
-        aboutItem.addActionListener(e -> 
-            JOptionPane.showMessageDialog(MainFrame.this,
-                "绘图程序 v1.0\n作者：YourName\n使用 Swing 开发",
-                "关于", JOptionPane.INFORMATION_MESSAGE)
-        );
         helpMenu.add(aboutItem);
         
         // 添加到菜单栏
@@ -110,61 +95,44 @@ public class MainFrame extends JFrame {
     private void initToolBar() {
         toolBar = new JToolBar();
         toolBar.setFloatable(false); // 固定工具栏
-
+        
         // 创建工具按钮
         btnLine = new JButton("画直线");
         btnRect = new JButton("画矩形");
         btnOval = new JButton("画椭圆");
         btnPolygon = new JButton("画多边形");
         btnClear = new JButton("清除");
-
-        // 为按钮添加事件监听器（带弹窗测试）
+        
+        // 为按钮添加事件监听器
         btnLine.addActionListener(e -> {
             System.out.println("点击了画直线");
             currentTool = "line";
             updateStatus();
-            // 🔔 事件测试：弹出提示
-            JOptionPane.showMessageDialog(this,
-                "已切换到【画直线】工具",
-                "工具切换提示",
-                JOptionPane.INFORMATION_MESSAGE);
         });
-
+        
         btnRect.addActionListener(e -> {
             System.out.println("点击了画矩形");
             currentTool = "rect";
             updateStatus();
-            JOptionPane.showMessageDialog(this,
-                "已切换到【画矩形】工具",
-                "工具切换提示",
-                JOptionPane.INFORMATION_MESSAGE);
         });
-
+        
         btnOval.addActionListener(e -> {
             System.out.println("点击了画椭圆");
             currentTool = "oval";
             updateStatus();
-            JOptionPane.showMessageDialog(this,
-                "已切换到【画椭圆】工具",
-                "工具切换提示",
-                JOptionPane.INFORMATION_MESSAGE);
         });
-
+        
         btnPolygon.addActionListener(e -> {
             System.out.println("点击了画多边形");
             currentTool = "polygon";
             updateStatus();
-            JOptionPane.showMessageDialog(this,
-                "已切换到【画多边形】工具",
-                "工具切换提示",
-                JOptionPane.INFORMATION_MESSAGE);
         });
-
+        
         btnClear.addActionListener(e -> {
-            drawingPanel.clear();
+            drawingPanel.clear(); // 清除绘图区内容
             System.out.println("已清除绘图区");
         });
-
+        
         // 添加按钮到工具栏
         toolBar.add(btnLine);
         toolBar.add(btnRect);
@@ -172,7 +140,7 @@ public class MainFrame extends JFrame {
         toolBar.add(btnPolygon);
         toolBar.addSeparator();
         toolBar.add(btnClear);
-
+        
         add(toolBar, BorderLayout.NORTH);
     }
     
@@ -180,40 +148,42 @@ public class MainFrame extends JFrame {
         drawingPanel = new DrawingPanel();
         drawingPanel.setPreferredSize(new Dimension(800, 500));
         add(drawingPanel, BorderLayout.CENTER);
+        
+        // 状态栏
+        JLabel statusLabel = new JLabel("就绪 - 当前工具: 直线");
+        statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
+        add(statusLabel, BorderLayout.SOUTH);
     }
     
     private void updateStatus() {
-        statusLabel.setText(" 当前工具: " + currentTool);
         System.out.println("当前工具: " + currentTool);
     }
     
     // 主方法
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getLookAndFeel());
-            } catch (Exception ignored) { }
             new MainFrame();
         });
     }
     
     // ============ 内部类：绘图面板 ============
     class DrawingPanel extends JPanel {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L; // 修复序列化警告
         
         // 存储绘图的点
-        private List<Point> points = new ArrayList<>();
+        private java.util.List<Point> points = new java.util.ArrayList<>();
         
         public DrawingPanel() {
             setBackground(Color.WHITE);
             setBorder(BorderFactory.createLineBorder(Color.GRAY));
             
-            // 鼠标点击监听器
+            // 设置鼠标监听器
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     System.out.println("绘图区被点击，坐标：" + e.getX() + ", " + e.getY());
                     
+                    // 根据当前工具处理点击
                     switch (currentTool) {
                         case "line":
                             points.add(new Point(e.getX(), e.getY()));
@@ -224,6 +194,7 @@ public class MainFrame extends JFrame {
                         case "rect":
                         case "oval":
                         case "polygon":
+                            // 其他工具暂时简单处理
                             points.add(new Point(e.getX(), e.getY()));
                             repaint();
                             break;
@@ -231,7 +202,6 @@ public class MainFrame extends JFrame {
                 }
             });
             
-            // 鼠标拖动监听器
             addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
@@ -240,7 +210,7 @@ public class MainFrame extends JFrame {
             });
         }
         
-        // 清除画布
+        // 清除方法 - 修复未定义错误
         public void clear() {
             points.clear();
             repaint();
@@ -251,29 +221,30 @@ public class MainFrame extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             
-            // 提示文字
-            if (points.isEmpty()) {
-                g.setColor(Color.LIGHT_GRAY);
-                g.setFont(new Font("微软雅黑", Font.PLAIN, 14));
-                g.drawString("在绘图区点击进行绘制", getWidth() / 2 - 60, getHeight() / 2);
-                g.drawString("当前工具: " + currentTool, getWidth() / 2 - 60, getHeight() / 2 + 20);
-            }
-
-            // 绘制点
+            // 设置绘图颜色
+            g.setColor(Color.BLACK);
+                
+            // 绘制提示文字
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawString("在绘图区点击进行绘制", 350, 250);
+            g.drawString("当前工具: " + currentTool, 350, 270);
+            
+            // 绘制已有点
             g.setColor(Color.RED);
             for (Point p : points) {
                 g.fillOval(p.x - 3, p.y - 3, 6, 6);
             }
-
-            // 绘制线段（仅直线模式演示连接）
+            
+            // 根据当前工具绘制
             if (points.size() >= 2 && currentTool.equals("line")) {
                 g.setColor(Color.BLUE);
                 for (int i = 0; i < points.size() - 1; i++) {
                     Point p1 = points.get(i);
-                    Point p2 = points.get(i + 1);
+                    Point p2 = points.get(i+1);
                     g.drawLine(p1.x, p1.y, p2.x, p2.y);
+                    }
                 }
             }
         }
     }
-}
+   
